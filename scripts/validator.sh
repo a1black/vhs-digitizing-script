@@ -40,7 +40,7 @@ function validate_output_file_name() {
         echo "empty_output_file"
         return 1
     fi
-    local path=$(realpath "$1")
+    local path=$(realpath "$1" 2> /dev/null)
     if [[ -z "$path" || -d "$path" ]]; then
         echo "invalid_output_file"
         return 1

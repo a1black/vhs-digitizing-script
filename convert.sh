@@ -38,7 +38,8 @@ while getopts ':ho:v:a:t:s:l:' OPTION; do
 done
 
 # Current directory.
-current_dir=${BASH_SOURCE[0]%/*}
+source="$(realpath "${BASH_SOURCE[0]}" 2> /dev/null)"
+current_dir="${source%/*}"
 [[ -z "$current_dir" || ! -d "$current_dir" ]] && current_dir="$PWD"
 # Include general functions.
 source "$current_dir/scripts/helper.sh"
@@ -47,11 +48,11 @@ source "$current_dir/scripts/validator.sh"
 
 if ! cmd_exists "ffmpeg"; then
     # Check dependencies.
-    get_msg "ffmpeg_missing" "$language"
+    print_msg "ffmpeg_missing" "$language"
     exit 1
 elif [ $UID -eq 0 ]; then
     # Check execution privilages.
-    get_msg "root_exec" "$language"
+    print_msg "root_exec" "$language"
     exit 1
 fi
 
@@ -64,7 +65,7 @@ validation_errors+=($(validate_timestamp "$stop_time"))
 validation_errors+=($(validate_standard_name "$tape_standard"))
 if [ ${#validation_errors[@]} -ne 0 ]; then
     for verror in ${validation_errors[@]}; do
-        get_msg "$verror" "$language"
+        print_msg "$verror" "$language"
     done
     exit 1
 fi
@@ -148,4 +149,5 @@ ffmpeg_command=$(printf -- "ffmpeg -loglevel 16 %s %s %s %s %s -t %s -y '%s'" \
     "$output_file" \
 )
 
+echo "$ffmpeg_command"
 bash -c "$ffmpeg_command"

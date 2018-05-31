@@ -30,7 +30,8 @@ done
 [ -z "$output_file" ] && output_file="$video_input"
 
 # Current directory.
-current_dir=${BASH_SOURCE[0]%/*}
+source="$(realpath "${BASH_SOURCE[0]}" 2> /dev/null)"
+current_dir="${source%/*}"
 [[ -z "$current_dir" || ! -d "$current_dir" ]] && current_dir="$PWD"
 # Include general functions.
 source "$current_dir/scripts/helper.sh"
@@ -79,4 +80,5 @@ ffmpeg_command=$(printf -- "ffmpeg -loglevel 8 %s -i %s -c:v copy -c:a copy -asy
     "$output_file" \
 )
 
-bash -c "$ffmpeg_command"
+echo "$ffmpeg_command"
+#bash -c "$ffmpeg_command"

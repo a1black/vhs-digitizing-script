@@ -13,12 +13,29 @@ en_msg[empty_output_file]="Error: output file is not specified."
 en_msg[invalid_output_file]="Error: invalid file path."
 en_msg[notwritable_output_file]="Error: provided path is not writable."
 en_msg[empty_timestamp]="Error: stop timestamp is not specified."
-en_msg[invalid_timestamp]="Error: invalid value of stop timestamp."
+en_msg[invalid_timestamp]="Error: invalid value of stop timestamp, correct syntax is HH:MM:SS."
 en_msg[empty_standard]="Error: video signal standard is not specified."
 en_msg[invalid_standard]="Error: unknown video signal standard."
 ## Truncate Errors
 en_msg[nonexisting_file]="Error: provided file does not exist."
 en_msg[notreadable_file]="Error: cannot read file."
+## Launch dialog options
+en_msg[select_launch_option]="Select lanch option: "
+en_msg[select_video_input]="Select video capturing device: "
+en_msg[select_audio_input]="Select audio capturing device: "
+en_msg[select_output_name]="Name for saving captured input: "
+en_msg[select_tape_standard]="Select VHS video standard: "
+en_msg[select_stop_time]="Set capture stop time: "
+en_msg[shutdown_on_complete]="Shutdown on completion [y/n] "
+en_msg[select_video_file]="Select video file: "
+en_msg[select_start_time]="Set time at the beginnig of video file: "
+en_msg[select_end_time]="Set time at the end of video file: "
+en_msg[output_save_path]="Save as ... "
+## Actions
+en_msg[record_action]="Start script for captuting video stream."
+en_msg[record]="Capture video"
+en_msg[trim]="Truncate video"
+en_msg[quiet]="Quiet"
 
 # Russian translations.
 ru_msg[root_exec]="Ошибка: скрипт был запущен с административными правами."
@@ -31,11 +48,29 @@ ru_msg[empty_output_file]="Ошибка: необходимо указать ф�
 ru_msg[invalid_output_file]="Ошибка: некорректный путь до файла сохранения."
 ru_msg[notwritable_output_file]="Ошибка: указанный путь недоступен для записи."
 ru_msg[empty_timestamp]="Ошибка: необходимо указать продолжительность записи."
-ru_msg[invalid_timestamp]="Ошибка: некорректное значение время записи."
+ru_msg[invalid_timestamp]="Ошибка: некорректное значение время записи, укажите ЧЧ:ММ:СС."
 ru_msg[empty_standard]="Ошибка: неуказан стандарт видео сигнала."
 ru_msg[invalid_standard]="Ошибка: неизвестный стандарт видео сигнала."
+## Truncate Errors
 ru_msg[nonexisting_file]="Ошибка: указанный файл не найден."
 ru_msg[notreadable_file]="Ошибка: файл не доступен для чтения."
+## Launcher dialog options
+ru_msg[select_launch_option]="Выбирете опцию для запуска: "
+ru_msg[select_video_input]="Выбирете устройство для записи видео: "
+ru_msg[select_audio_input]="Выбирете устройство для записи аудио: "
+ru_msg[select_output_name]="Укажите имя файла для сохранения видео: "
+ru_msg[select_tape_standard]="Укажите стандарт кодирования видео записи: "
+ru_msg[select_stop_time]="Указите продолжительность записи: "
+ru_msg[shutdown_on_complete]="Выключить компьютер по завершению [y/n] "
+ru_msg[select_video_file]="Выбирете видео файл: "
+ru_msg[select_start_time]="Время обрезки в начале видео: "
+ru_msg[select_end_time]="Время обрезки в конце видео: "
+ru_msg[output_save_path]="Файл будет сохранен как ... "
+## Actions
+ru_msg[record_action]="Запуск скрипта записи видео."
+ru_msg[record]="Запись видео"
+ru_msg[trim]="Обрезать видео"
+ru_msg[quiet]="Выход"
 
 # Returns message by its identifier.
 # Args:
@@ -46,9 +81,15 @@ function get_msg() {
     [ -z "$id" ] && return 1
     [ -z "$lang" ] && lang="$A1_GLOBAL_LANG"
     if [ "$lang" = ru ]; then
-        [[ -n ${ru_msg[$id]} || -z ${ru_msg[$id]+foo} ]] && echo ${ru_msg[$id]}
+        [[ -v ru_msg["$id"] ]] && echo -n "${ru_msg["$id"]}"
     else
-        [[ -n ${en_msg[$id]} || -z ${en_msg[$id]+foo} ]] && echo ${en_msg[$id]}
+        [[ -v en_msg["$id"] ]] && echo -n "${en_msg["$id"]}"
     fi
     return 0
+}
+
+# Same as `get_msg` but adds NL to the end of message.
+function print_msg() {
+    get_msg "$1" "$2"
+    [ $? -eq 0 ] && printf "\n"
 }
