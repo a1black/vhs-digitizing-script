@@ -1,5 +1,22 @@
 #!/usr/bin/env bash
 
+set -u
+
+# Global values.
+A1_GLOBAL_VIDEO_API=v4l2
+A1_GLOBAL_AUDIO_API=alsa
+A1_GLOBAL_VIDEO_CODEC=h264
+A1_GLOBAL_AUDIO_CODEC=aac
+A1_GLOBAL_PIXEL_FMT=yuv420p
+# Defined variables.
+output_file=
+video_input=
+audio_input=
+tape_standard=auto
+stop_time=
+language=en
+
+# Help message.
 show_usage() {
     cat << EOF
 $(basename $0) [OPTIONS]
@@ -16,14 +33,6 @@ EOF
     exit 0
 }
 
-# Global values.
-A1_GLOBAL_VIDEO_API=v4l2
-A1_GLOBAL_AUDIO_API=alsa
-A1_GLOBAL_VIDEO_CODEC=h264
-A1_GLOBAL_AUDIO_CODEC=aac
-A1_GLOBAL_PIXEL_FMT=yuv420p
-# Default values.
-tape_standard=auto
 # Read script arguments.
 while getopts ':ho:v:a:t:s:l:' OPTION; do
     case "$OPTION" in
@@ -42,9 +51,9 @@ source="$(realpath "${BASH_SOURCE[0]}" 2> /dev/null)"
 current_dir="${source%/*}"
 [[ -z "$current_dir" || ! -d "$current_dir" ]] && current_dir="$PWD"
 # Include general functions.
-source "$current_dir/scripts/helper.sh"
-source "$current_dir/scripts/message.sh"
-source "$current_dir/scripts/validator.sh"
+source "$current_dir/scripts/helper.sh" || exit 1
+source "$current_dir/scripts/message.sh" || exit 1
+source "$current_dir/scripts/validator.sh" || exit 1
 
 if ! cmd_exists "ffmpeg"; then
     # Check dependencies.
@@ -69,7 +78,7 @@ if [ ${#validation_errors[@]} -ne 0 ]; then
     done
     exit 1
 fi
-unset validation_errors
+unset validation_errors verror
 
 # Form part of video input options.
 # Args:
@@ -138,15 +147,26 @@ get_standard_output_options() {
     fi
     printf -- "$cmd_part"
 }
+# Form part of time limit options.
+# Args:
+#   $1      recording time
+get_time_output_options() {
+    local time="$1"
+    local cmd_part=''
+    if [ -n "$time" ]; then
+        cmd_part+=" -t $time"
+    fi
+    printf -- "$cmd_part"
+}
 # Assemble ffmpeg command.
-ffmpeg_command=$(printf -- "ffmpeg -loglevel 16 %s %s %s %s %s -t %s -y '%s'" \
+ffmpeg_command=$(printf -- "ffmpeg -loglevel 16 %s %s %s %s %s -t %s -y %s" \
     "$(get_video_input_options "$video_input")" \
     "$(get_audio_input_options "$audio_input")" \
     "$(get_video_output_options "$video_input")" \
     "$(get_standard_output_options "$tape_standard" "$video_input")" \
     "$(get_audio_output_options "$audio_input")" \
-    "$stop_time" \
-    "$output_file" \
+    "$(get_time_output_options "$stop_time")" \
+    "$(printf %q "$output_file")" \
 )
 
 printf "\n%s\n" "$(get_msg "capture_started" "$language")"

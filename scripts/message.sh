@@ -17,6 +17,7 @@ en_msg[invalid_timestamp]="Error: invalid value of stop timestamp, correct synta
 en_msg[empty_standard]="Error: video signal standard is not specified."
 en_msg[invalid_standard]="Error: unknown video signal standard."
 ## Truncate Errors
+en_msg[invalid_root_dir]="Error: invalid execution root path."
 en_msg[empty_file_path]="Error: file path is not specified."
 en_msg[nonexisting_file]="Error: provided file does not exist."
 en_msg[notreadable_file]="Error: cannot read file."
@@ -59,6 +60,7 @@ ru_msg[invalid_timestamp]="Ошибка: некорректное значени
 ru_msg[empty_standard]="Ошибка: неуказан стандарт видео сигнала."
 ru_msg[invalid_standard]="Ошибка: неизвестный стандарт видео сигнала."
 ## Truncate Errors
+ru_msg[invalid_root_dir]="Ошибка: некорректный путь корневой директории процесса."
 ru_msg[empty_file_path]="Ошибка: путь к файлу не указан."
 ru_msg[nonexisting_file]="Ошибка: указанный файл не найден."
 ru_msg[notreadable_file]="Ошибка: файл не доступен для чтения."

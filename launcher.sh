@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
 # Interactive launcher for other scripts in project.
 
+set -u
+
+# Global values.
+A1_GLOBAL_SAVE_PATH=
+# Defined variables.
+root_dir=
+language=en
+
 # Read script options.
-while getopts ":l:" OPTION; do
+while getopts ":l:d:" OPTION; do
     case "$OPTION" in
+        d) root_dir="$OPTARG";;
         l) language="$OPTARG";;
         *) exit 1
     esac
@@ -14,9 +23,9 @@ source="$(realpath "${BASH_SOURCE[0]}" 2> /dev/null)"
 current_dir="${source%/*}"
 [[ -z "$current_dir" || ! -d "$current_dir" ]] && current_dir="$PWD"
 # Include general functions.
-source "$current_dir/scripts/helper.sh"
-source "$current_dir/scripts/message.sh"
-source "$current_dir/scripts/validator.sh"
+source "$current_dir/scripts/helper.sh" || exit 1
+source "$current_dir/scripts/message.sh" || exit 1
+source "$current_dir/scripts/validator.sh" || exit 1
 
 if ! cmd_exists "ffmpeg"; then
     # Check dependencies.
@@ -28,21 +37,16 @@ elif [ $UID -eq 0 ]; then
     exit 1
 fi
 
-# Global values.
-A1_GLOBAL_SAVE_PATH=$(realpath ~/Videos 2> /dev/null)
+# Validate script arguments.
+if [ -n "$root_dir" ]; then
+    root_dir="$(realpath "$root_dir" 2> /dev/null)"
+    if [[ -z "$root_dir" || ! -d "$root_dir" || ! -w "$root_dir" || ! -r "$root_dir" ]]; then
+        get_msg "invalid_root_dir" "$language"
+        exit 1
+    fi
+    A1_GLOBAL_SAVE_PATH="$root_dir"
+fi
 
-# Terminates script execution.
-launch_quiet() {
-    exit 0
-}
-# Configures and runs vhs convertion script.
-launch_record() {
-    source "$current_dir/scripts/dialog_convert.sh"
-}
-# Configures and runs video truncating script.
-launch_truncate() {
-    source "$current_dir/scripts/dialog_truncate.sh"
-}
 # Requests user to select thouther action.
 dialog_launch_option() {
     local option label=''
@@ -68,11 +72,11 @@ dialog_launch_option() {
 # Select luanch option.
 dialog_launch_option
 if [ "$action" = 'quiet' ]; then
-    launch_quiet
+    exit 0
 elif [ "$action" = 'record' ]; then
-    launch_record
+    source "$current_dir/scripts/dialog_convert.sh"
 elif [ "$action" = 'trim' ]; then
-    launch_truncate
+    source "$current_dir/scripts/dialog_truncate.sh"
 else
     print_msg "unkhown_option" "$language"
     exit 1
