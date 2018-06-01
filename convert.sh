@@ -149,5 +149,6 @@ ffmpeg_command=$(printf -- "ffmpeg -loglevel 16 %s %s %s %s %s -t %s -y '%s'" \
     "$output_file" \
 )
 
+printf "\n%s\n" "$(get_msg "capture_started" "$language")"
 echo "$ffmpeg_command"
 bash -c "$ffmpeg_command"

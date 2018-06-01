@@ -14,7 +14,9 @@ source="$(realpath "${BASH_SOURCE[0]}" 2> /dev/null)"
 current_dir="${source%/*}"
 [[ -z "$current_dir" || ! -d "$current_dir" ]] && current_dir="$PWD"
 # Include general functions.
+source "$current_dir/scripts/helper.sh"
 source "$current_dir/scripts/message.sh"
+source "$current_dir/scripts/validator.sh"
 
 if ! cmd_exists "ffmpeg"; then
     # Check dependencies.
