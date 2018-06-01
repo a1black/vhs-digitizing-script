@@ -90,11 +90,11 @@ function validate_standard_name() {
 # Args:
 #   $1      file path
 function validate_file_exists() {
-    if [ -z "$1" ]; then
-        return 0
-    fi
     local path="$1"
-    if [ ! -f "$path" ]; then
+    if [ -z "$path" ]; then
+        echo "empty_file_path"
+        return 1
+    elif [ ! -f "$path" ]; then
         echo "nonexisting_file"
         return 1
     elif [ ! -r "$path" ]; then
