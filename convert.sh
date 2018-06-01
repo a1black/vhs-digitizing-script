@@ -117,7 +117,7 @@ get_video_output_options() {
     if [ -n "$input" ]; then
         [ -n "$color" ] && cmd_part+=" -pix_fmt $color"
         [ -n "$codec" ] && cmd_part+=" -c:v $codec"
-        [ "$codec" = h264 ] && cmd_part+=" -preset veryfast -crf=25"
+        [ "$codec" = h264 ] && cmd_part+=" -preset veryfast -crf 25"
     fi
     printf -- "$cmd_part"
 }
@@ -159,7 +159,7 @@ get_time_output_options() {
     printf -- "$cmd_part"
 }
 # Assemble ffmpeg command.
-ffmpeg_command=$(printf -- "ffmpeg -loglevel 16 %s %s %s %s %s -t %s -y %s" \
+ffmpeg_command=$(printf -- "ffmpeg -loglevel 16 %s %s %s %s %s %s -y %s" \
     "$(get_video_input_options "$video_input")" \
     "$(get_audio_input_options "$audio_input")" \
     "$(get_video_output_options "$video_input")" \
